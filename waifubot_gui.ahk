@@ -23,17 +23,17 @@ IniRead, PAUSE_TIMER, %variables%, waifubot, pauseTimer
 GoSub, gui_box_calc
 GoSub, gui_elements
 GoSub, time_calculator
-exit
+exitApp
 
 ~^F3::
   Pause, Toggle, 1
   scriptState := "Paused"
-  GuiControl, , statusToggle, % "Current Status:" . scriptState
+  GuiControl, , statusToggle, % "Current Status: " . scriptState
 return
 
 ~^F4::
   scriptState := "Stopping"
-  GuiControl, , statusToggle, % "Current Status:" . scriptState
+  GuiControl, , statusToggle, % "Current Status: " . scriptState
   IniRead, exitScript, %variables%, waifubot, exitScript
   loop{
     IniRead, exitScript, %variables%, waifubot, exitScript
@@ -53,8 +53,8 @@ return
 gui_elements:
   Gui, 1: New, +AlwaysOnTop, Waifubot
   Gui, add, Text, ,Waifubot GUI
-  Gui, add, Text, vremainTime, % "Time Remaining: " . remainTime . " seconds"
-  Gui, add, Progress, vprogressBar W350 H20 cRed, 100
+  Gui, add, Text, vremainTime, % "Estimated time remaining: " . remainTime . " seconds"
+  Gui, add, Progress, vprogressBar W350 H20 cRed, 0
   Gui, add, Text, , % "Press Ctrl+F3 to pause or Ctrl+F4 to stop"
   Gui, add, Text, vstatusToggle, % "Current Status: Running"
   Gui, show, W%GUI_X% H%GUI_Y% X%screenResX% Y%screenResY% NoActivate
@@ -65,8 +65,8 @@ time_calculator:
   {
     Sleep 1000
     remainTime--
-    GuiControl, Text, remainTime, % "Time Remaining: " . remainTime . " seconds"
-    barPercent := (remainTime / totalTime * 100)
+    GuiControl, Text, remainTime, % "Estimated time remaining: " . remainTime . " seconds"
+    barPercent := (100 - (remainTime / totalTime * 100))
     GuiControl, , progressBar, %barPercent%
 
     if(scriptState != Running)
