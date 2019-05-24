@@ -9,27 +9,27 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 #SingleInstance	; Only allows one instance of the script to run.
 
 ;Variable setup
-variables = variables.ini
+variables := "variables.ini"
 arrayX := 0 ;Sets up the running total counter. There might be a more efficient way of doing this but I can't be bothered looking it up so feel free to do it yourself
 iWaifucount := [] ;Sets up the array for the individual waifus.
 iniWrite, 0, %variables%, waifubot, waifuCount
 iniRead, pauseToggle, %variables%, waifubot, pauseToggle
 iniRead, pauseTimer, %variables%, waifubot, pauseTimer
-iniWrite, false, %variables%, waifubot, exitScript
 
 ~^F3::
   Pause
 Return
 
 ~^F4::
-  loopBreak = 1
+  loopBreak := 1
 Return
 
 ^F1:: ;Starts script on Ctrl+F1
-  waifuCount = 0
-  loopBreak = 0
+  waifuCount := 0
+  loopBreak := 0
+  iniWrite, false, %variables%, waifubot, exitScript
 
-  InputBox, waifuCount, Interact counter, How many waifus do you want to interact with?, , ,150, , , , , e.g: 24 ;Message box to determine how many waifus you want to interact with
+  InputBox, waifuCount, Interact counter, % "How many waifus do you want to interact with?", , ,150, , , , , % "e.g: 24" ;Message box to determine how many waifus you want to interact with
   if(ErrorLevel = 1)
   {
     loopBreak = 1
@@ -44,7 +44,6 @@ Return
   {
     if(loopBreak = 1) ;Check for cancellation
     {
-      iniWrite, true, %variables%, waifubot, exitScript
       MsgBox, Interaction cancelled ;Message box to signal a cancellation
       break ;Breaks the while loop
     }
@@ -57,13 +56,14 @@ Return
 
   }
   MsgBox, Successfully interacted ;Message box to signal ending
+  iniWrite, 1, %variables%, waifubot, exitScript
 return
 
 ^F2:: ;Starts event on Ctrl+F2
-  waifuCount = 0
+  waifuCount := 0
 
   loop{ ;Loops infinitely until you type stop
-    Inputbox, msgCounter , Interact counter, Type the waifus you want to interact with one by one. Press the cancel button when you've inputted all your waifus in., , , ,120, , , ,e.g: 151 ;message box
+    Inputbox, msgCounter , Interact counter, % "Type the waifus you want to interact with one by one. Press the cancel button when you've inputted all your waifus in.", , , ,120, , , , % "e.g: 151" ;message box
     If(ErrorLevel = 1) ;stops when you press the cancel button. Reason why it's an if break loop and not a loop until is so it doesn't store the "e.g: 151" as part of the array
     {
       break ;Breaks the loop and moves onto the next part
