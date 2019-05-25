@@ -37,7 +37,7 @@ Return
   else
   {
     iniWrite, %waifuCount%, %variables%, waifubot, waifuCount
-    Run, waifubot_gui.ahk
+    Run, waifubot_gui.exe
   }
 
   while(waifuCount >= 0) ;Starts loop which repeats for every waifu you have
@@ -76,7 +76,7 @@ return
   }
 
   iniWrite, %waifuCount%, %variables%, waifubot, waifuCount
-  Run, waifubot_gui.ahk
+  Run, waifubot_gui.exe
   iniWrite, 0, %variables%, waifubot, exitScript
 
   arrayX -- ;Takes 1 away from arrayX. Basically a reversal of the the "arrayX++" line so the first entry isn't an empty cell
