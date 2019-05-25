@@ -1,4 +1,4 @@
-;The main thing you can adjust is the PAUSE_TIMER
+;The main thing you can adjust is the PAUSE_TIMER variable
 ;You can increase this number to get more reliable results because the ping of waifubot varies
 ;The minimum cooldown accounting for no lag is around 3.4 seconds
 
@@ -8,23 +8,23 @@ SendMode Input  ; Recommended for new scripts due to its superior speed and reli
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 #SingleInstance	; Only allows one instance of the script to run.
 
-;‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾;
-;  Variable setup   ;
-;___________________;
+;‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾;
+;   Variable setup   ;
+;____________________;
 
-variables := "variables.ini" ;Variable for the ini file. Sorta uneccesary but doesn't really matter
 PAUSE_TIMER := 4500 ;Variable for how long it waits before sending the next message
+variables := "variables.ini" ;Variable for the ini file. Sorta uneccesary but doesn't really matter
 iniWrite, 0, %variables%, waifubot, waifuCount ;Writes in a blank value into the ini file
 
 ;‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾;
 ;   Additional Hotkey setup   ;
 ;_____________________________;
 
-~^F3:: ;Pauses script on ctrl+F3
+~^F3:: ;Pauses script on ctrl+F3. ~ is so it can work at the same time as the GUI script
   Pause
 Return
 
-~^F4:: ;Breaks loop on ctrl+F4 to stop the script prematurely
+~^F4:: ;Breaks loop on ctrl+F4 to stop the script. ~ is so it can work at the same time as the GUI script
   loopBreak := 1 ;Variable for break condition. A statement in the loop checks if it's 1 or 0
 Return
 
@@ -70,7 +70,7 @@ Return
   ;Finish
   MsgBox, Successfully interacted ;Message box to signal ending
   iniWrite, 1, %variables%, waifubot, exitScript ;[GUI] Writes exit script condition
-return ;Ends script
+return
 
 ;F2 script - interact with individual waifus
 ^F2:: ;Starts event on Ctrl+F2

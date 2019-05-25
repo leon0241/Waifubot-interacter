@@ -1,4 +1,4 @@
-;The main thing you will be editing is line 26 - the "Sleep, 4500"
+;The main thing you can adjust is the PAUSE_TIMER variable
 ;You can increase this number to get more reliable results because the ping of waifubot varies
 ;The minimum cooldown accounting for no lag is around 3.4 seconds
 
@@ -8,82 +8,100 @@ SendMode Input  ; Recommended for new scripts due to its superior speed and reli
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 #SingleInstance	; Only allows one instance of the script to run.
 
-;Variable setup
-variables := "variables.ini"
-arrayX := 0 ;Sets up the running total counter. There might be a more efficient way of doing this but I can't be bothered looking it up so feel free to do it yourself
-iWaifucount := [] ;Sets up the array for the individual waifus.
-iniWrite, 0, %variables%, waifubot, waifuCount
-iniRead, pauseToggle, %variables%, waifubot, pauseToggle
-iniRead, pauseTimer, %variables%, waifubot, pauseTimer
+;‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾;
+;   Variable setup   ;
+;____________________;
 
-~^F3::
+PAUSE_TIMER := 4500 ;Variable for how long it waits before sending the next message
+variables := "variables.ini" ;Variable for the ini file. Sorta uneccesary but doesn't really matter
+iniWrite, 0, %variables%, waifubot, waifuCount ;Writes in a blank value into the ini file
+
+;‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾;
+;   Additional Hotkey setup   ;
+;_____________________________;
+
+~^F3:: ;Pauses script on ctrl+F3. ~ is so it can work at the same time as the GUI script
   Pause
 Return
 
-~^F4::
-  loopBreak := 1
+~^F4:: ;Breaks loop on ctrl+F4 to stop the script. ~ is so it can work at the same time as the GUI script
+  loopBreak := 1 ;Variable for break condition. A statement in the loop checks if it's 1 or 0
 Return
 
+;‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾;
+;   Main Scripts   ;
+;__________________;
+
+;F1 script - Interacts with all waifus
 ^F1:: ;Starts script on Ctrl+F1
-  waifuCount := 0
-  loopBreak := 0
-  iniWrite, 0, %variables%, waifubot, exitScript
+  ;Variable setup
+  waifuCount := 0 ;Resets waifu count number
+  loopBreak := 0 ;Resets break condition
+  iniWrite, 0, %variables%, waifubot, exitScript ;[GUI] resets exit script condition
 
+  ;Input for your waifus
   InputBox, waifuCount, Interact counter, % "How many waifus do you want to interact with?", , ,150, , , , , % "e.g: 24" ;Message box to determine how many waifus you want to interact with
-  if(ErrorLevel = 1)
+  if(ErrorLevel = 1) ;Checks to see if you cancelled the message box
   {
-    loopBreak = 1
+    loopBreak = 1 ;Sets break condition
   }
-  else
+  else ;GUI launch
   {
-    iniWrite, %waifuCount%, %variables%, waifubot, waifuCount
-    Run, waifubot_gui.exe
+    iniWrite, %waifuCount%, %variables%, waifubot, waifuCount ;[GUI] Writes the amount of waifus you have
+    Run, waifubot_gui.exe ;Runs the script for the GUI
   }
 
+  ;Output for your waifus
   while(waifuCount >= 0) ;Starts loop which repeats for every waifu you have
   {
-    if(loopBreak = 1) ;Check for cancellation
+    if(loopBreak = 1) ;Check for cancellation with the break condition
     {
       MsgBox, Interaction cancelled ;Message box to signal a cancellation
       break ;Breaks the while loop
     }
 
-    Send, % "w.interact " . waifuCount ;Type out the "w.interact [x]". %% indicates the use of a variable
+    Send, % "w.interact " . waifuCount ;Type out the "w.interact [x]" message
     Sleep, 100 ;Short pause. the enter keystroke doesn't register if you don't pause. potentially can be lower but i couldn't be bothered testing the boundaries
     Send, {enter} ;Enter keystroke to send the message into the chat
-    Sleep, %pauseTimer% ;Pause to wait for the cooldown
-    waifuCount-- ;Takes away 1 from var waifuCount so the loop will end once it's counted down to 0
-
+    Sleep, %PAUSE_TIMER% ;Pause to wait for the cooldown
+    waifuCount-- ;Takes away 1 from var waifuCount so the loop will end once it's at 0
   }
+
+  ;Finish
   MsgBox, Successfully interacted ;Message box to signal ending
-  iniWrite, 1, %variables%, waifubot, exitScript
+  iniWrite, 1, %variables%, waifubot, exitScript ;[GUI] Writes exit script condition
 return
 
+;F2 script - interact with individual waifus
 ^F2:: ;Starts event on Ctrl+F2
-  waifuCount := 0
-  loopBreak := 0
+  ;Variable setup
+  waifuCount := 0 ;Resets waifu count number. Also acts as running total counter
+  loopBreak := 0 ;Resets break condition
+  iWaifucount := [] ;Sets up the array for the individual waifus.
 
-  loop{ ;Loops infinitely until you type stop
-    Inputbox, msgCounter , Interact counter, % "Type the waifus you want to interact with one by one. Press the cancel button when you've inputted all your waifus in.", , , ,120, , , , % "e.g: 151" ;message box
+  ;Input for your waifus
+  loop{ ;Loops infinitely until you cancel/escape
+    Inputbox, msgValue , Interact counter, % "Type the waifus you want to interact with one by one. Press the cancel button when you've inputted all your waifus in.", , , ,120, , , , % "e.g: 151"
     If(ErrorLevel = 1) ;stops when you press the cancel button. Reason why it's an if break loop and not a loop until is so it doesn't store the "e.g: 151" as part of the array
     {
-      break ;Breaks the loop and moves onto the next part
+      break ;Breaks the loop and moves over to the output
     }
-    iWaifuCount[arrayX] := msgCounter ;Puts variable in [arrayX] of array
-    tempCounter := iWaifuCount[arrayX] ;Stores a variable so it can read if the command is to stop
-    waifuCount++
-    arrayX++ ;increments arrayX by 1 so the next loop stores the variable in the next array cell
+
+    iWaifuCount[waifuCount] := msgValue ;Puts variable in [x] of array
+    waifuCount++ ;[GUI] Increases the waifu count by 1
   }
 
+  ;GUI launch
   iniWrite, %waifuCount%, %variables%, waifubot, waifuCount
-  Run, waifubot_gui.exe
   iniWrite, 0, %variables%, waifubot, exitScript
+  Run, waifubot_gui.exe
 
-  arrayX -- ;Takes 1 away from arrayX. Basically a reversal of the the "arrayX++" line so the first entry isn't an empty cell
+  waifuCount -- ;Takes 1 away from waifuCount. Used so the first line isn't empty
 
-  if(arrayX >= 0) ;Whole second loop around an if statement. This is only so it doesn't spit out an empty interaction if you cancel from the get-go
+  ;Output of your waifus
+  if(waifuCount >= 0) ;Whole second loop around an if statement. This is only so it doesn't spit out an empty interaction if you cancel from the get-go
   {
-    loop ;Loops infinitely until it meets the until condition on line 80
+    loop ;Loops infinitely until it meets the until condition
     {
       if(loopBreak = 1) ;Check for cancellation
       {
@@ -91,15 +109,16 @@ return
         break ;Breaks the while loop
       }
 
-      tempCounter := iWaifuCount[arrayX] ;stores the counter[arrayX] into the temporary variable so it can be read by the send command
-      Send, % "w.interact " . tempCounter
+      tempCounter := iWaifuCount[waifuCount] ;stores the counter[x] into the temporary variable so it can be read by the send command
+      Send, % "w.interact " . tempCounter ;Types out the "w.interact [x]" message
       Sleep, 100 ;Short pause since the enter keystroke doesn't register if you don't pause. potentially can be lower but i couldn't be bothered testing the boundaries
       Send, {enter} ;Enter keystroke to send the message into the chat
-      Sleep, %pauseTimer% ;Pause to wait for the cooldown
-      arrayX-- ;Decrements arrayX by one for the running total
-    }until arrayX < 0 ;Stops the loop when arrayX reaches the bottom so it doesn't loop infinitely
+      Sleep, %PAUSE_TIMER% ;Pause to wait for the cooldown
+      waifuCount-- ;Decrements arrayX by one for the running total
+    }until waifuCount < 0 ;Stops the loop when arrayX reaches the bottom so it doesn't loop infinitely
   }
 
+  ;Finish
   MsgBox, Successfully interacted ;Message box to signal ending
-  iniWrite, 1, %variables%, waifubot, exitScript
+  iniWrite, 1, %variables%, waifubot, exitScript ;[GUI] Writes exit script condition
 return
