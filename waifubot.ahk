@@ -27,7 +27,7 @@ Return
 ^F1:: ;Starts script on Ctrl+F1
   waifuCount := 0
   loopBreak := 0
-  iniWrite, false, %variables%, waifubot, exitScript
+  iniWrite, 0, %variables%, waifubot, exitScript
 
   InputBox, waifuCount, Interact counter, % "How many waifus do you want to interact with?", , ,150, , , , , % "e.g: 24" ;Message box to determine how many waifus you want to interact with
   if(ErrorLevel = 1)
@@ -48,7 +48,7 @@ Return
       break ;Breaks the while loop
     }
 
-    Send, w.interact %waifuCount% ;Type out the "w.interact [x]". %% indicates the use of a variable
+    Send, % "w.interact " . waifuCount ;Type out the "w.interact [x]". %% indicates the use of a variable
     Sleep, 100 ;Short pause. the enter keystroke doesn't register if you don't pause. potentially can be lower but i couldn't be bothered testing the boundaries
     Send, {enter} ;Enter keystroke to send the message into the chat
     Sleep, %pauseTimer% ;Pause to wait for the cooldown
@@ -61,6 +61,7 @@ return
 
 ^F2:: ;Starts event on Ctrl+F2
   waifuCount := 0
+  loopBreak := 0
 
   loop{ ;Loops infinitely until you type stop
     Inputbox, msgCounter , Interact counter, % "Type the waifus you want to interact with one by one. Press the cancel button when you've inputted all your waifus in.", , , ,120, , , , % "e.g: 151" ;message box
@@ -76,6 +77,7 @@ return
 
   iniWrite, %waifuCount%, %variables%, waifubot, waifuCount
   Run, waifubot_gui.ahk
+  iniWrite, 0, %variables%, waifubot, exitScript
 
   arrayX -- ;Takes 1 away from arrayX. Basically a reversal of the the "arrayX++" line so the first entry isn't an empty cell
 
@@ -83,14 +85,14 @@ return
   {
     loop ;Loops infinitely until it meets the until condition on line 80
     {
-      if(GetKeyState("F4", "P")) ;Check for cancellation
+      if(loopBreak = 1) ;Check for cancellation
       {
         MsgBox, Interaction cancelled ;Message box to signal a cancellation
         break ;Breaks the while loop
       }
 
       tempCounter := iWaifuCount[arrayX] ;stores the counter[arrayX] into the temporary variable so it can be read by the send command
-      Send, w.interact %tempCounter%
+      Send, % "w.interact " . tempCounter
       Sleep, 100 ;Short pause since the enter keystroke doesn't register if you don't pause. potentially can be lower but i couldn't be bothered testing the boundaries
       Send, {enter} ;Enter keystroke to send the message into the chat
       Sleep, %pauseTimer% ;Pause to wait for the cooldown
@@ -99,4 +101,5 @@ return
   }
 
   MsgBox, Successfully interacted ;Message box to signal ending
+  iniWrite, 1, %variables%, waifubot, exitScript
 return
