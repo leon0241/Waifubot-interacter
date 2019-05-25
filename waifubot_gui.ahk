@@ -10,6 +10,7 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 
 GUI_X := 400 ;Sets variable for the X size of the GUI
 GUI_Y := 200 ;Sets variable for the Y size of the GUI
+PAUSE_TIMER := 4500
 variables := "variables.ini" ;Variable for the ini file. Sorta uneccesary but doesn't really matter
 scriptState := "Running" ;Initialisation for status text variable
 IniRead, waifuCounter, %variables%, waifubot, waifuCount ;Reads waifu count from the main script passthrough
