@@ -22,7 +22,7 @@ For the second script, press ctrl+f2 to run, and type each waifu you want intera
 
 If you ever want to cancel the script halfway through, *hold* f4 until the message box appears saying it's cancelled.
 
-##Files and their uses
+## Files and their uses
 - variables.ini: Acts as a passthrough for variables between the GUI and master script. Also includes the variable for the waiting timer in case you ever want to edit that to make it longer/shorter
 - waifubot.ahk: Master AHK file that runs the scripts.
 - waifubot_exe.ahk: AHK file with a changed run command so it will run the GUI's exe file instead of the autohotkey
