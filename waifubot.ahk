@@ -126,11 +126,9 @@ return
 ^F5::
   Gui, 2: new, +AlwaysOnTop, Waifubot
   Gui, add, text, ,Waifu worker
-  Gui, add, Checkbox, , % "Value retires currently working waifus"
+  Gui, add, Checkbox, , % "retire currently working waifus"
   Gui, add, Checkbox, , % "Send individual waifus to work"
-  Gui, add, text, ,Type in the lowest ID of the waifu you want to retire
-  Gui, Add, edit
-  Gui, Add, UpDown, vMyUpDown Range1-10, 5
-  Gui, add, button, , Ok
-  Gui, add, button, , Cancel
+  Gui, add, button, Y75 X50 W100, Confirm
+  Gui, add, button, Y75 X250 W100, Cancel
+  Gui, show, W400 H100
 return
