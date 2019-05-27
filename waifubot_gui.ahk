@@ -31,12 +31,12 @@ exitApp ;Exits the script
 ~^F3:: ;Pauses script on ctrl+F3. ~ is so it can work at the same time as the GUI script
   Pause, Toggle, 1 ;Pauses the thread. Don't really know the options of the pause command but it works so ¯\_(ツ)_/¯
   scriptState := "Paused" ;Sets the script state to paused. This is used later in the update loop to change it back to running
-  GuiControl 1:, , statusToggle, % "Current Status: " . scriptState ;Changes the text of the status element
+  GuiControl, , statusToggle, % "Current Status: " . scriptState ;Changes the text of the status element
 return
 
 ~^F4:: ;Pauses script on ctrl+F4. ~ is so it can work at the same time as the GUI script
   scriptState := "Stopped" ;Sets script state to stopped. Same reason as F3 hotkey
-  GuiControl 1:, , statusToggle, % "Current Status: " . scriptState ;Changes the text of the status element
+  GuiControl, , statusToggle, % "Current Status: " . scriptState ;Changes the text of the status element
 
   ; loop to wait until the main script is also finished before it stops the GUI.
   IniRead, exitScript, %variables%, waifubot, exitScript ;Reads the exitScript variable from the ini to see its value
@@ -74,14 +74,14 @@ update_loop: ;Creates running loop to change GUI elements
   {
     Sleep 1000 ;Waits 1 second/1000ms
     remainTime-- ;Takes away 1 from remainTime
-    GuiControl 1:, Text, remainTime, % "Estimated time remaining: " . remainTime . " seconds" ;Updates the remaining time text
+    GuiControl, Text, remainTime, % "Estimated time remaining: " . remainTime . " seconds" ;Updates the remaining time text
     barPercent := (100 - (remainTime / totalTime * 100)) ;Calculates the progress bars percentage
     GuiControl 1:, , progressBar, %barPercent% ;Updates the progress bars percentage
 
     if(scriptState != Running) ;Checks if the the script state isn't running(paused)
     {
       scriptState := "Running" ;Sets the script state to running
-      GuiControl 1:, Text, statusToggle, % "Current Status: " . scriptState ;Changes the state back to running
+      GuiControl, Text, statusToggle, % "Current Status: " . scriptState ;Changes the state back to running
     }
   }
 return
