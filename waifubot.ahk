@@ -122,3 +122,15 @@ return
   MsgBox, Successfully interacted ;Message box to signal ending
   iniWrite, 1, %variables%, waifubot, exitScript ;[GUI] Writes exit script condition
 return
+
+^F5::
+  Gui, 2: new, +AlwaysOnTop, Waifubot
+  Gui, add, text, ,Waifu worker
+  Gui, add, Checkbox, , % "Value retires currently working waifus"
+  Gui, add, Checkbox, , % "Send individual waifus to work"
+  Gui, add, text, ,Type in the lowest ID of the waifu you want to retire
+  Gui, Add, edit
+  Gui, Add, UpDown, vMyUpDown Range1-10, 5
+  Gui, add, button, , Ok
+  Gui, add, button, , Cancel
+return
