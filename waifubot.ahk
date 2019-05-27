@@ -124,11 +124,24 @@ return
 return
 
 ^F5::
-  Gui, 2: new, +AlwaysOnTop, Waifubot
+  retireCheck = 0
+  individualCheck = 0
+
+  Gui, 2: new, , Waifubot
   Gui, add, text, ,Waifu worker
-  Gui, add, Checkbox, , % "retire currently working waifus"
-  Gui, add, Checkbox, , % "Send individual waifus to work"
-  Gui, add, button, Y75 X50 W100, Confirm
+  Gui, add, Checkbox, vretireCheck, % "retire currently working waifus"
+  Gui, add, Checkbox, vindividualCheck, % "Send individual waifus to work"
+  Gui, add, button, Y75 X50 W100 gwConfirm, Confirm
   Gui, add, button, Y75 X250 W100, Cancel
   Gui, show, W400 H100
 return
+
+wConfirm:
+  if(retireCheck = 1)
+  {
+    listVars
+  }
+  else
+  {
+    MsgBox, no
+  }
