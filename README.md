@@ -31,6 +31,11 @@ If you ever want to cancel the script halfway through, *hold* f4 until the messa
 - waifubot_gui.exe: compiled version of the GUI
 
 ## To Do list
+###priority
 - Add working/retire script
 - Add central GUI for convenience
 - Move f2 script to the side
+- add stop message if on wrong channel
+###uncertain if possible
+- add some way to do it minimised
+- add some way to do an f2 script without typing numbers yourself
