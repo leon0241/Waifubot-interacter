@@ -20,7 +20,8 @@ For the first script, press ctrl+f1 to run the script, and type the highest id i
 
 For the second script, press ctrl+f2 to run, and type each waifu you want interacted with one by one into the message box. When you've entered them all, press cancel and it will cycle through your inputted list.
 
-If you ever want to cancel the script halfway through, *hold* f4 until the message box appears saying it's cancelled.
+If you ever want to cancel the script halfway through, Press Ctrl+F4, and the GUI should change to stopping status. Then, when the message box appears, the script has stopped.
+You can also press ctrl+F3 to pause the script, and press it again to resume it
 
 ## Files and their uses
 - variables.ini: Acts as a passthrough for variables between the GUI and master script. Also includes the variable for the waiting timer in case you ever want to edit that to make it longer/shorter
