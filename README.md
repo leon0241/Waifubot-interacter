@@ -29,3 +29,8 @@ If you ever want to cancel the script halfway through, *hold* f4 until the messa
 - waifubot.exe: Compiled version of waifubot_exe.ahk
 - waifubot_gui.ahk: Code for the GUI
 - waifubot_gui.exe: compiled version of the GUI
+
+## To Do list
+- Add working/retire script
+- Add central GUI for convenience
+- Move f2 script to the side
