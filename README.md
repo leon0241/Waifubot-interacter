@@ -37,6 +37,7 @@ You can also press ctrl+F3 to pause the script, and press it again to resume it
 - Add central GUI for convenience
 - Move f2 script to the side
 - add stop message if on wrong channel
+- Change loop to use loop, count and a_index
 
 ### uncertain if possible
 - add some way to do it minimised
