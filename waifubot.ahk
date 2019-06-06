@@ -129,19 +129,45 @@ return
 
   Gui, 2: new, , Waifubot
   Gui, add, text, ,Waifu worker
-  Gui, add, Checkbox, vretireCheck, % "retire currently working waifus"
-  Gui, add, Checkbox, vindividualCheck, % "Send individual waifus to work"
-  Gui, add, button, Y75 X50 W100 gwConfirm, Confirm
-  Gui, add, button, Y75 X250 W100, Cancel
+  Gui, add, Checkbox, gretire_check, % "retire currently working waifus"
+  Gui, add, Checkbox, gindividual_check, % "Send individual waifus to work"
+  Gui, add, button, Y75 X50 W100 gw_confirm, Confirm
+  Gui, add, button, Y75 X250 W100 gw_cancel, Cancel
   Gui, show, W400 H100
 return
 
-wConfirm:
+retire_check:
+  retireCheck = 1
+return
+
+individual_check:
+  individualCheck = 1
+return
+
+w_confirm:
+  Gui, hide
   if(retireCheck = 1)
   {
-    listVars
+    WaifuCount = 10
   }
   else
   {
-    MsgBox, no
+    waifuCount = 5
   }
+  Inputbox, workID , Waifu worker, % "Type the lowest id for the waifus you want to work", , , ,120, , , , % "e.g: 24"
+  MsgBox, %waifuCount%
+  Loop, % waifuCount
+  {
+    MsgBox, test
+    Send, % "w.work " . workID ;Type out the "w.interact [x]" message
+    Sleep, 100 ;Short pause. the enter keystroke doesn't register if you don't pause. potentially can be lower but i couldn't be bothered testing the boundaries
+    Send, {enter} ;Enter keystroke to send the message into the chat
+    ;Sleep, %PAUSE_TIMER% ;Pause to wait for the cooldown
+    workID ++
+  }
+
+return
+
+w_cancel:
+  Gui, hide
+return
