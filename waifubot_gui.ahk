@@ -76,7 +76,7 @@ update_loop: ;Creates running loop to change GUI elements
     remainTime-- ;Takes away 1 from remainTime
     GuiControl, Text, remainTime, % "Estimated time remaining: " . remainTime . " seconds" ;Updates the remaining time text
     barPercent := (100 - (remainTime / totalTime * 100)) ;Calculates the progress bars percentage
-    GuiControl 1:, , progressBar, %barPercent% ;Updates the progress bars percentage
+    GuiControl, , progressBar, %barPercent% ;Updates the progress bars percentage
 
     if(scriptState != Running) ;Checks if the the script state isn't running(paused)
     {
