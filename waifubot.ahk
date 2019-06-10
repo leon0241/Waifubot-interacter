@@ -41,22 +41,12 @@ Return
 
   ;Input for your waifus
   InputBox, waifuCount, Interact counter, % "How many waifus do you want to interact with?", , ,150, , , , , % "e.g: 24" ;Message box to determine how many waifus you want to interact with
-  if(ErrorLevel = 1) ;Checks to see if you cancelled the message box
-    loopBreak = 1 ;Sets break condition
-  else ;GUI launch
-  {
-    iniWrite, %waifuCount%, %variables%, waifubot, waifuCount ;[GUI] Writes the amount of waifus you have
-    Run, waifubot_gui.ahk ;Runs the script for the GUI
-  }
+  GoSub, gui_check
 
   ;Output for your waifus
   Loop, % waifuCount ;Starts loop which repeats for every waifu you have
   {
-    if(loopBreak = 1) ;Check for cancellation with the break condition
-    {
-      MsgBox, Interaction cancelled ;Message box to signal a cancellation
-      break ;Breaks the while loop
-    }
+    GoSub, loop_break
 
     Send, % "w.interact " . waifuCount ;Type out the "w.interact [x]" message
     Sleep, 100 ;Short pause. the enter keystroke doesn't register if you don't pause. potentially can be lower but i couldn't be bothered testing the boundaries
@@ -66,8 +56,7 @@ Return
   }
 
   ;Finish
-  MsgBox, Successfully interacted ;Message box to signal ending
-  iniWrite, 1, %variables%, waifubot, exitScript ;[GUI] Writes exit script condition
+  GoSub, finish_text
 return
 
 ;F2 script - interact with individual waifus
@@ -76,6 +65,7 @@ return
   waifuCount := 0 ;Resets waifu count number. Also acts as running total counter
   loopBreak := 0 ;Resets break condition
   iWaifucount := [] ;Sets up the array for the individual waifus.
+  iniWrite, 0, %variables%, waifubot, exitScript
 
   ;Input for your waifus
   loop{ ;Loops infinitely until you cancel/escape
@@ -89,7 +79,6 @@ return
 
   ;GUI launch
   iniWrite, %waifuCount%, %variables%, waifubot, waifuCount
-  iniWrite, 0, %variables%, waifubot, exitScript
   Run, waifubot_gui.ahk
 
   waifuCount -- ;Takes 1 away from waifuCount. Used so the first line isn't empty
@@ -99,11 +88,7 @@ return
   {
     loop, %WaifuCount% ;Loops infinitely until it meets the until condition
     {
-      if(loopBreak = 1) ;Check for cancellation
-      {
-        MsgBox, Interaction cancelled ;Message box to signal a cancellation
-        break ;Breaks the while loop
-      }
+      GoSub, loop_break
 
       Send, % "w.interact " . iWaifuCount[waifuCount] ;Types out the "w.interact [x]" message
       Sleep, 100 ;Short pause since the enter keystroke doesn't register if you don't pause. potentially can be lower but i couldn't be bothered testing the boundaries
@@ -114,29 +99,30 @@ return
   }
 
   ;Finish
-  MsgBox, Successfully interacted ;Message box to signal ending
-  iniWrite, 1, %variables%, waifubot, exitScript ;[GUI] Writes exit script condition
+  GoSub, finish_text
 return
 
 ^F5::
-  retireCheck = 0
-  individualCheck = 0
+  retireCheck := 0
+  individualCheck := 0
+  iWorkID := []
+  iniWrite, 0, %variables%, waifubot, exitScript
 
   Gui, 2: new, , Waifubot
   Gui, add, text, ,Waifu worker
   Gui, add, Checkbox, gretire_check, % "retire currently working waifus"
   Gui, add, Checkbox, gindividual_check, % "Send individual waifus to work"
-  Gui, add, button, Y75 X50 W100 gw_confirm, Confirm
-  Gui, add, button, Y75 X250 W100 gw_cancel, Cancel
+  Gui, add, button, Y75 X50 W100 gw_confirm, % "Confirm"
+  Gui, add, button, Y75 X250 W100 gw_cancel, % "Cancel"
   Gui, show, W400 H100
 return
 
 retire_check:
-  retireCheck = 1
+  retireCheck := 1
 return
 
 individual_check:
-  individualCheck = 1
+  individualCheck := 1
 return
 
 w_confirm:
@@ -145,26 +131,31 @@ w_confirm:
   if(retireCheck = 1)
     waifuCount := 10
   else
-    waifuCount = 5
+    waifuCount := 5
+
+  iniWrite, %waifuCount%, %variables%, waifubot, waifuCount
 
   if(individualCheck = 0)
   {
     Inputbox, workID , Waifu worker, % "Type the lowest id for the waifus you want to work", , , ,120, , , , % "e.g: 24"
+    GoSub, gui_check
 
-      Loop, % WaifuCount
-      {
-        if (waifuCount > 5)
-          Send, % "w.retire " . workID
-        else
-          Send, % "w.work " . workID ;Type out the "w.interact [x]" message
+    Loop, % WaifuCount
+    {
+      GoSub, loop_break
 
-        Sleep, 100 ;Short pause. the enter keystroke doesn't register if you don't pause. potentially can be lower but i couldn't be bothered testing the boundaries
-        Send, {enter} ;Enter keystroke to send the message into the chat
-        ;Sleep, %PAUSE_TIMER% ;Pause to wait for the cooldown
-        workID ++
-        waifuCount --
-      }
+      if (waifuCount > 5)
+        Send, % "w.retire " . workID
+      else
+        Send, % "w.work " . workID
 
+      workID ++
+      waifuCount --
+      Sleep, 100 ;Short pause. the enter keystroke doesn't register if you don't pause. potentially can be lower but i couldn't be bothered testing the boundaries
+      Send, {enter} ;Enter keystroke to send the message into the chat
+      ;Sleep, %PAUSE_TIMER% ;Pause to wait for the cooldown
+    }
+    GoSub, finish_text
   }
   else
   {
@@ -176,18 +167,43 @@ w_confirm:
 
     loop, % waifuCount
     {
+      GoSub, loop_break
+
       if(waifuCount > 5)
-      {
-        Send, % "w.work" . iWorkID[A_Index]
-      }
+        Send, % "w.retire " . iWorkID[A_Index]
+      else
+        Send, % "w.work " . iWorkID[A_Index]
 
-
-      Send, % "w.work" . iWorkID[A_Index]
+      waifuCount --
       Sleep, 100
       Send, {enter}
+      ;Sleep, %PAUSE_TIMER% ;Pause to wait for the cooldown
     }
-
+    GoSub, finish_text
   }
+return
+
+gui_check:
+  if(ErrorLevel = 1) ;Checks to see if you cancelled the message box
+    loopBreak = 1 ;Sets break condition
+  else ;GUI launch
+  {
+    iniWrite, %waifuCount%, %variables%, waifubot, waifuCount ;[GUI] Writes the amount of waifus you have
+    Run, waifubot_gui.ahk ;Runs the script for the GUI
+  }
+return
+
+loop_break:
+  if(loopBreak = 1) ;Check for cancellation
+  {
+    MsgBox, Interaction cancelled ;Message box to signal a cancellation
+    break ;Breaks the while loop
+  }
+return
+
+finish_text:
+  iniWrite, 1, %variables%, waifubot, exitScript ;[GUI] Writes exit script condition
+  MsgBox, Successfully interacted ;Message box to signal ending
 return
 
 w_cancel:
