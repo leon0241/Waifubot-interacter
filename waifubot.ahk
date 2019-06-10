@@ -155,17 +155,14 @@ w_confirm:
     waifuCount = 5
   }
   Inputbox, workID , Waifu worker, % "Type the lowest id for the waifus you want to work", , , ,120, , , , % "e.g: 24"
-  MsgBox, %waifuCount%
   Loop, % waifuCount
   {
-    MsgBox, test
     Send, % "w.work " . workID ;Type out the "w.interact [x]" message
     Sleep, 100 ;Short pause. the enter keystroke doesn't register if you don't pause. potentially can be lower but i couldn't be bothered testing the boundaries
     Send, {enter} ;Enter keystroke to send the message into the chat
     ;Sleep, %PAUSE_TIMER% ;Pause to wait for the cooldown
     workID ++
   }
-
 return
 
 w_cancel:
