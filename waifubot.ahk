@@ -42,9 +42,7 @@ Return
   ;Input for your waifus
   InputBox, waifuCount, Interact counter, % "How many waifus do you want to interact with?", , ,150, , , , , % "e.g: 24" ;Message box to determine how many waifus you want to interact with
   if(ErrorLevel = 1) ;Checks to see if you cancelled the message box
-  {
     loopBreak = 1 ;Sets break condition
-  }
   else ;GUI launch
   {
     iniWrite, %waifuCount%, %variables%, waifubot, waifuCount ;[GUI] Writes the amount of waifus you have
@@ -83,9 +81,7 @@ return
   loop{ ;Loops infinitely until you cancel/escape
     Inputbox, msgValue , Interact counter, % "Type the waifus you want to interact with one by one. Press the cancel button when you've inputted all your waifus in.", , , ,120, , , , % "e.g: 151"
     If(ErrorLevel = 1) ;stops when you press the cancel button. Reason why it's an if break loop and not a loop until is so it doesn't store the "e.g: 151" as part of the array
-    {
       break ;Breaks the loop and moves over to the output
-    }
 
     iWaifuCount[waifuCount] := msgValue ;Puts variable in [x] of array
     waifuCount++ ;[GUI] Increases the waifu count by 1
@@ -147,13 +143,9 @@ w_confirm:
   Gui, hide
 
   if(retireCheck = 1)
-  {
     waifuCount := 10
-  }
   else
-  {
     waifuCount = 5
-  }
 
   if(individualCheck = 0)
   {
@@ -167,9 +159,7 @@ w_confirm:
           waifuCount --
         }
         else
-        {
           Send, % "w.work " . workID ;Type out the "w.interact [x]" message
-        }
 
         Sleep, 100 ;Short pause. the enter keystroke doesn't register if you don't pause. potentially can be lower but i couldn't be bothered testing the boundaries
         Send, {enter} ;Enter keystroke to send the message into the chat
