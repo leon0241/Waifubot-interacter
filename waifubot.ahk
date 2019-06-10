@@ -124,7 +124,6 @@ individual_check:
   individualCheck := 1
 return
 
-
 w_confirm:
   Gui, hide
 
