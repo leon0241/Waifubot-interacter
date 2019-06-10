@@ -52,7 +52,7 @@ Return
   }
 
   ;Output for your waifus
-  while(waifuCount >= 0) ;Starts loop which repeats for every waifu you have
+  Loop, % waifuCount ;Starts loop which repeats for every waifu you have
   {
     if(loopBreak = 1) ;Check for cancellation with the break condition
     {
@@ -101,7 +101,7 @@ return
   ;Output of your waifus
   if(waifuCount >= 0) ;Whole second loop around an if statement. This is only so it doesn't spit out an empty interaction if you cancel from the get-go
   {
-    loop ;Loops infinitely until it meets the until condition
+    loop, %WaifuCount% ;Loops infinitely until it meets the until condition
     {
       if(loopBreak = 1) ;Check for cancellation
       {
@@ -109,13 +109,12 @@ return
         break ;Breaks the while loop
       }
 
-      tempCounter := iWaifuCount[waifuCount] ;stores the counter[x] into the temporary variable so it can be read by the send command
-      Send, % "w.interact " . tempCounter ;Types out the "w.interact [x]" message
+      Send, % "w.interact " . iWaifuCount[waifuCount] ;Types out the "w.interact [x]" message
       Sleep, 100 ;Short pause since the enter keystroke doesn't register if you don't pause. potentially can be lower but i couldn't be bothered testing the boundaries
       Send, {enter} ;Enter keystroke to send the message into the chat
       Sleep, %PAUSE_TIMER% ;Pause to wait for the cooldown
       waifuCount-- ;Decrements arrayX by one for the running total
-    }until waifuCount < 0 ;Stops the loop when arrayX reaches the bottom so it doesn't loop infinitely
+    }
   }
 
   ;Finish
@@ -146,22 +145,49 @@ return
 
 w_confirm:
   Gui, hide
+
   if(retireCheck = 1)
   {
-    WaifuCount = 10
+    waifuCount := 10
   }
   else
   {
     waifuCount = 5
   }
-  Inputbox, workID , Waifu worker, % "Type the lowest id for the waifus you want to work", , , ,120, , , , % "e.g: 24"
-  Loop, % waifuCount
+
+  if(individualCheck = 0)
   {
-    Send, % "w.work " . workID ;Type out the "w.interact [x]" message
-    Sleep, 100 ;Short pause. the enter keystroke doesn't register if you don't pause. potentially can be lower but i couldn't be bothered testing the boundaries
-    Send, {enter} ;Enter keystroke to send the message into the chat
-    ;Sleep, %PAUSE_TIMER% ;Pause to wait for the cooldown
-    workID ++
+    Inputbox, workID , Waifu worker, % "Type the lowest id for the waifus you want to work", , , ,120, , , , % "e.g: 24"
+
+      Loop, % WaifuCount
+      {
+        if (waifuCount > 5)
+        {
+          Send, % "w.retire " . workID
+          waifuCount --
+        }
+        else
+        {
+          Send, % "w.work " . workID ;Type out the "w.interact [x]" message
+        }
+
+        Sleep, 100 ;Short pause. the enter keystroke doesn't register if you don't pause. potentially can be lower but i couldn't be bothered testing the boundaries
+        Send, {enter} ;Enter keystroke to send the message into the chat
+        ;Sleep, %PAUSE_TIMER% ;Pause to wait for the cooldown
+        workID ++
+      }
+
+  }
+  else if(individualCheck = 1)
+  {
+    loop, % waifuCount
+    {
+      InputBox, workID, Waifu worker, % "Type the id of the waifu you want to work", , , ,120, , , , % "e.g: 24"
+      Send, % "w.work" . workID
+      Sleep, 100
+      Send, {enter}
+    }
+
   }
 return
 
