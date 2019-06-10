@@ -154,10 +154,7 @@ w_confirm:
       Loop, % WaifuCount
       {
         if (waifuCount > 5)
-        {
           Send, % "w.retire " . workID
-          waifuCount --
-        }
         else
           Send, % "w.work " . workID ;Type out the "w.interact [x]" message
 
@@ -165,15 +162,27 @@ w_confirm:
         Send, {enter} ;Enter keystroke to send the message into the chat
         ;Sleep, %PAUSE_TIMER% ;Pause to wait for the cooldown
         workID ++
+        waifuCount --
       }
 
   }
-  else if(individualCheck = 1)
+  else
   {
     loop, % waifuCount
     {
-      InputBox, workID, Waifu worker, % "Type the id of the waifu you want to work", , , ,120, , , , % "e.g: 24"
-      Send, % "w.work" . workID
+      InputBox, workID, Waifu worker, % "Type the id of the waifu you want to work", , , ,120
+      iWorkID[A_Index] := workID
+    }
+
+    loop, % waifuCount
+    {
+      if(waifuCount > 5)
+      {
+        Send, % "w.work" . iWorkID[A_Index]
+      }
+
+
+      Send, % "w.work" . iWorkID[A_Index]
       Sleep, 100
       Send, {enter}
     }
