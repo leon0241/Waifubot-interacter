@@ -103,6 +103,7 @@ return
 ^F5::
   retireCheck := 0
   individualCheck := 0
+  loopBreak := 0
   iWorkID := []
   iniWrite, 0, %variables%, waifubot, exitScript
 
@@ -122,6 +123,7 @@ return
 individual_check:
   individualCheck := 1
 return
+
 
 w_confirm:
   Gui, hide
@@ -161,6 +163,9 @@ w_confirm:
       InputBox, workID, Waifu worker, % "Type the id of the waifu you want to work", , , ,120
       iWorkID[A_Index] := workID
     }
+
+    iniWrite, %waifuCount%, %variables%, waifubot, waifuCount
+    Run, waifubot_gui.ahk
 
     loop, % waifuCount
     {
