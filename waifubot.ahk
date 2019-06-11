@@ -77,8 +77,7 @@ return
   }
 
   ;GUI launch
-  iniWrite, %waifuCount%, %variables%, waifubot, waifuCount
-  Run, waifubot_gui.ahk
+  GoSub, run_gui
 
   waifuCount -- ;Takes 1 away from waifuCount. Used so the first line isn't empty
 
@@ -132,8 +131,6 @@ w_confirm:
   else
     waifuCount := 5
 
-  iniWrite, %waifuCount%, %variables%, waifubot, waifuCount
-
   if(individualCheck = 0)
   {
     Inputbox, workID , Waifu worker, % "Type the lowest id for the waifus you want to work", , , ,120, , , , % "e.g: 24"
@@ -163,8 +160,7 @@ w_confirm:
       iWorkID[A_Index] := workID
     }
 
-    iniWrite, %waifuCount%, %variables%, waifubot, waifuCount
-    Run, waifubot_gui.ahk
+    GoSub, run_gui
 
     loop, % waifuCount
     {
@@ -188,9 +184,13 @@ gui_check:
     loopBreak = 1 ;Sets break condition
   else ;GUI launch
   {
-    iniWrite, %waifuCount%, %variables%, waifubot, waifuCount ;[GUI] Writes the amount of waifus you have
-    Run, waifubot_gui.ahk ;Runs the script for the GUI
+    GoSub, run_gui
   }
+return
+
+run_gui:
+  iniWrite, %waifuCount%, %variables%, waifubot, waifuCount ;[GUI] Writes the amount of waifus you have
+  Run, waifubot_gui.ahk ;Runs the script for the GUI
 return
 
 finish_text:
