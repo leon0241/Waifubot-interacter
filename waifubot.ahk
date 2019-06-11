@@ -35,11 +35,11 @@ Return
 ;F1 script - Interacts with all waifus
 ^F1:: ;Starts script on Ctrl+F1
   ;Variable setup
-  GoSub, variable_setup
+  GoSub, variable_setup ;Jump to L106
 
   ;Input for your waifus
   InputBox, waifuCount, Interact counter, % "How many waifus do you want to interact with?", , ,150, , , , , % "e.g: 24"
-  GoSub, gui_check
+  GoSub, gui_check ;Jump to L118
 
   ;Output for your waifus
   Loop, % (waifuCount + 1) ;Starts loop which repeats for every waifu you have
@@ -48,18 +48,18 @@ Return
       break ;Breaks the while loop
 
     Send, % "w.interact " . waifuCount ;Type out the "w.interact [x]" message
-    GoSub, message_finish
+    GoSub, message_finish ;Jump to L130
     waifuCount-- ;Takes away 1 from var waifuCount so the loop will end once it's at 0
   }
 
   ;Finish
-  GoSub, script_finish
+  GoSub, script_finish ;Jump to L136
 return
 
 ;F2 script - interact with individual waifus
 ^F2:: ;Starts event on Ctrl+F2
   ;Variable setup
-  GoSub, variable_setup
+  GoSub, variable_setup ;Jump to L106
 
   ;Input for your waifus
   loop
@@ -73,7 +73,10 @@ return
   }
 
   ;GUI launch
-  GoSub, gui_check
+  if(ErrorLevel = 1 AND waifuCount = 0) ;Checks to see if you cancelled the message box
+    loopBreak := 1 ;Sets break condition
+  else ;GUI launch
+    GoSub, run_gui ;Jump to L125
 
   waifuCount -- ;Takes 1 away from waifuCount. Used so the first line isn't empty
 
@@ -86,31 +89,24 @@ return
         break ;Breaks the while loop
 
       Send, % "w.interact " . iWaifuCount[waifuCount] ;Types out the "w.interact [x]" message
-      GoSub, message_finish
+      GoSub, message_finish ;Jump to L130
       waifuCount-- ;Decrements arrayX by one for the running total
     }
   }
 
   ;Finish
-  GoSub, script_finish
+  GoSub, script_finish ;Jump to L136
 return
 
 ^F5::
-  GoSub, variable_setup
-
-  Gui, 2: new, , Waifubot
-  Gui, add, text, ,Waifu worker
-  Gui, add, Checkbox, gretire_check, % "retire currently working waifus"
-  Gui, add, Checkbox, gindividual_check, % "Send individual waifus to work"
-  Gui, add, button, Y75 X50 W100 gw_confirm, % "Confirm"
-  Gui, add, button, Y75 X250 W100 gw_cancel, % "Cancel"
-  Gui, show, W400 H100
+  GoSub, variable_setup ;Jump to L106
+  GoSub, create_working_gui ;Jump to L144
 return
 
 variable_setup: ;[general] Setups variables and arrays
   waifuCount := 0 ;Resets waifu count number
   loopBreak := 0 ;Resets break condition
-  iniWrite, 0, %VARIABLES%, waifubot, exitScript ;[GUI] resets exit script condition
+  iniWrite, 0, %VARIABLES%, waifubot, exitScript ; resets exit script condition
 
   iWaifucount := [] ;Sets up the array for the individual waifus.
 
@@ -123,7 +119,7 @@ gui_check: ;[general] Checks to see if you cancelled to see whether to run the G
   if(ErrorLevel = 1) ;Checks to see if you cancelled the message box
     loopBreak := 1 ;Sets break condition
   else ;GUI launch
-    GoSub, run_gui
+    GoSub, run_gui ;Jump to L125
 return
 
 run_gui: ;[general] Sets the waifu count and runs the GUI script
@@ -143,6 +139,16 @@ script_finish: ;[general] Actions for after the script has finished looping
     MsgBox, Interaction cancelled ;Message box to signal a cancellation
   else
     MsgBox, Successfully interacted ;Message box to signal ending
+return
+
+create_working_gui: ;[general] Creates GUI for working script
+  Gui, 2: new, , Waifubot ;Creates new GUI
+  Gui, add, text, ,Waifu worker ;Title text
+  Gui, add, Checkbox, gretire_check, % "retire currently working waifus" ;Checkbox for retiring waifus
+  Gui, add, Checkbox, gindividual_check, % "Send individual waifus to work" ;Checkbox for sending individual waifus to work
+  Gui, add, button, Y75 X50 W100 gw_confirm, % "Confirm" ;Confirm button
+  Gui, add, button, Y75 X250 W100 gw_cancel, % "Cancel" ;Cancel button
+  Gui, show, W400 H100
 return
 
 retire_check: ;[working] Increments if the retire waifus checkbox is pressed
@@ -169,9 +175,9 @@ w_confirm: ;[working] Actions to take after you press the confirm button(main bo
   if(individualCheck = 0)
   {
     Inputbox, workID , Waifu worker, % "Type the lowest id for the waifus you want to work", , , ,120, , , , % "e.g: 24"
-    GoSub, gui_check
-    GoSub, working_loop
-    GoSub, script_finish
+    GoSub, gui_check ;Jump to L118
+    GoSub, working_loop ;Jump to L196
+    GoSub, script_finish ;Jump to L136
   }
   else
   {
@@ -181,9 +187,9 @@ w_confirm: ;[working] Actions to take after you press the confirm button(main bo
       iWorkID[A_Index] := workID
     }
 
-    GoSub, run_gui
-    GoSub, working_loop
-    GoSub, script_finish
+    GoSub, run_gui ;Jump to L125
+    GoSub, working_loop ;Jump to L196
+    GoSub, script_finish ;Jump to L136
   }
 return
 
@@ -193,16 +199,17 @@ working_loop: ;[working] Types and increments working values
     if(loopBreak = 1) ;Check for cancellation
       break ;Breaks the while loop
 
-    if (waifuCount > 5 AND individualCheck = 0)
+    ;Check to see what message to send in the chat
+    if (waifuCount > 5 AND individualCheck = 0) ;retire and increment
       Send, % "w.retire " . workID
-    else if (waifuCount > 5 AND individualCheck = 1)
+    else if (waifuCount > 5 AND individualCheck = 1) ;retire and individual
       Send, % "w.retire " . iWorkID[A_Index]
-    else if (individualCheck = 0)
+    else if (individualCheck = 0) ;work and increment
       Send, % "w.work " . workID
-    else
+    else ;work and individual
       Send, % "w.work " . iWorkID[A_Index]
-    workID ++
-    waifuCount --
-    GoSub, message_finish
+    workID ++ ;Increments workID. Doesn't affect individual since it uses a different var.
+    waifuCount -- ;Decrements waifuCount. Used for the if loop
+    GoSub, message_finish ;Jump to L127
   }
 return
