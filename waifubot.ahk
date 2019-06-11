@@ -53,7 +53,7 @@ Return
   }
 
   ;Finish
-  GoSub, finish_text
+  GoSub, script_finish
 return
 
 ;F2 script - interact with individual waifus
@@ -92,7 +92,7 @@ return
   }
 
   ;Finish
-  GoSub, finish_text
+  GoSub, script_finish
 return
 
 ^F5::
@@ -107,15 +107,58 @@ return
   Gui, show, W400 H100
 return
 
-retire_check:
+variable_setup: ;[general] Setups variables and arrays
+  waifuCount := 0 ;Resets waifu count number
+  loopBreak := 0 ;Resets break condition
+  iniWrite, 0, %VARIABLES%, waifubot, exitScript ;[GUI] resets exit script condition
+
+  iWaifucount := [] ;Sets up the array for the individual waifus.
+
+  retireCheck := 0
+  individualCheck := 0
+  iWorkID := []
+return
+
+gui_check: ;[general] Checks to see if you cancelled to see whether to run the GUI
+  if(ErrorLevel = 1) ;Checks to see if you cancelled the message box
+    loopBreak := 1 ;Sets break condition
+  else ;GUI launch
+    GoSub, run_gui
+return
+
+run_gui: ;[general] Sets the waifu count and runs the GUI script
+  iniWrite, %waifuCount%, %VARIABLES%, waifubot, waifuCount ;[GUI] Writes the amount of waifus you have
+  Run, waifubot_gui.ahk ;Runs the script for the GUI
+return
+
+message_finish: ;[general] Returns and waits after any message
+  Sleep, 100 ;Short wait to ensure the enter keystroke is measured
+  Send, {enter} ;Enter keystroke to send the message into the chat
+  Sleep, % PAUSE_TIMER ;Pause to wait for the cooldown
+return
+
+script_finish: ;[general] Actions for after the script has finished looping
+  iniWrite, 1, %VARIABLES%, waifubot, exitScript ;Writes exit script condition
+  if(loopBreak = 1)
+    MsgBox, Interaction cancelled ;Message box to signal a cancellation
+  else
+    MsgBox, Successfully interacted ;Message box to signal ending
+return
+
+retire_check: ;[working] Increments if the retire waifus checkbox is pressed
   retireCheck := 1
 return
 
-individual_check:
+individual_check: ;[working] Increments if the individual waifus checkbox is pressed
   individualCheck := 1
 return
 
-w_confirm:
+w_cancel: ;[working] Cancellation for GUI selection
+   Gui, hide
+   MsgBox, Interaction cancelled
+return
+
+w_confirm: ;[working] Actions to take after you press the confirm button(main body)
   Gui, hide
 
   if(retireCheck = 1)
@@ -128,7 +171,7 @@ w_confirm:
     Inputbox, workID , Waifu worker, % "Type the lowest id for the waifus you want to work", , , ,120, , , , % "e.g: 24"
     GoSub, gui_check
     GoSub, working_loop
-    GoSub, finish_text
+    GoSub, script_finish
   }
   else
   {
@@ -140,54 +183,11 @@ w_confirm:
 
     GoSub, run_gui
     GoSub, working_loop
-    GoSub, finish_text
+    GoSub, script_finish
   }
 return
 
-gui_check:
-  if(ErrorLevel = 1) ;Checks to see if you cancelled the message box
-    loopBreak := 1 ;Sets break condition
-  else ;GUI launch
-    GoSub, run_gui
-return
-
-run_gui:
-  iniWrite, %waifuCount%, %VARIABLES%, waifubot, waifuCount ;[GUI] Writes the amount of waifus you have
-  Run, waifubot_gui.ahk ;Runs the script for the GUI
-return
-
-variable_setup:
-  waifuCount := 0 ;Resets waifu count number
-  loopBreak := 0 ;Resets break condition
-  iniWrite, 0, %VARIABLES%, waifubot, exitScript ;[GUI] resets exit script condition
-
-  iWaifucount := [] ;Sets up the array for the individual waifus.
-
-  retireCheck := 0
-  individualCheck := 0
-  iWorkID := []
-return
-
-finish_text:
-  iniWrite, 1, %VARIABLES%, waifubot, exitScript ;[GUI] Writes exit script condition
-  if(loopBreak = 1)
-    MsgBox, Interaction cancelled ;Message box to signal a cancellation
-  else
-    MsgBox, Successfully interacted ;Message box to signal ending
-return
-
-message_finish:
-  Sleep, 100
-  Send, {enter} ;Enter keystroke to send the message into the chat
-  ;Sleep, % PAUSE_TIMER ;Pause to wait for the cooldown
-return
-
-w_cancel:
-   Gui, hide
-   MsgBox, Interaction cancelled
-return
-
-working_loop:
+working_loop: ;[working] Types and increments working values
   Loop, % WaifuCount
   {
     if(loopBreak = 1) ;Check for cancellation
