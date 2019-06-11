@@ -34,11 +34,7 @@ Return
 
 ;F1 script - Interacts with all waifus
 ^F1:: ;Starts script on Ctrl+F1
-  ;Variable setup
-  waifuCount := 0 ;Resets waifu count number
-  loopBreak := 0 ;Resets break condition
-  iniWrite, 0, %variables%, waifubot, exitScript ;[GUI] resets exit script condition
-
+  GoSub, variable_setup
   ;Input for your waifus
   InputBox, waifuCount, Interact counter, % "How many waifus do you want to interact with?", , ,150, , , , , % "e.g: 24" ;Message box to determine how many waifus you want to interact with
   GoSub, gui_check
@@ -186,6 +182,12 @@ gui_check:
   {
     GoSub, run_gui
   }
+return
+
+variable_setup:
+  waifuCount := 0 ;Resets waifu count number
+  loopBreak := 0
+  iniWrite, 0, %variables%, waifubot, exitScript
 return
 
 run_gui:

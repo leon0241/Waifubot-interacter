@@ -35,9 +35,7 @@ Return
 ;F1 script - Interacts with all waifus
 ^F1:: ;Starts script on Ctrl+F1
   ;Variable setup
-  waifuCount := 0 ;Resets waifu count number
-  loopBreak := 0 ;Resets break condition
-  iniWrite, 0, %variables%, waifubot, exitScript ;[GUI] resets exit script condition
+  GoSub, variable_setup
 
   ;Input for your waifus
   InputBox, waifuCount, Interact counter, % "How many waifus do you want to interact with?", , ,150, , , , , % "e.g: 24" ;Message box to determine how many waifus you want to interact with
@@ -61,10 +59,7 @@ return
 ;F2 script - interact with individual waifus
 ^F2:: ;Starts event on Ctrl+F2
   ;Variable setup
-  waifuCount := 0 ;Resets waifu count number. Also acts as running total counter
-  loopBreak := 0 ;Resets break condition
-  iWaifucount := [] ;Sets up the array for the individual waifus.
-  iniWrite, 0, %variables%, waifubot, exitScript
+  GoSub, variable_setup
 
   ;Input for your waifus
   loop{ ;Loops infinitely until you cancel/escape
@@ -100,11 +95,7 @@ return
 return
 
 ^F5::
-  retireCheck := 0
-  individualCheck := 0
-  loopBreak := 0
-  iWorkID := []
-  iniWrite, 0, %variables%, waifubot, exitScript
+  GoSub, variable_setup
 
   Gui, 2: new, , Waifubot
   Gui, add, text, ,Waifu worker
@@ -191,6 +182,18 @@ return
 run_gui:
   iniWrite, %waifuCount%, %variables%, waifubot, waifuCount ;[GUI] Writes the amount of waifus you have
   Run, waifubot_gui.ahk ;Runs the script for the GUI
+return
+
+variable_setup:
+  waifuCount := 0 ;Resets waifu count number
+  loopBreak := 0 ;Resets break condition
+  iniWrite, 0, %variables%, waifubot, exitScript ;[GUI] resets exit script condition
+
+  iWaifucount := [] ;Sets up the array for the individual waifus.
+
+  retireCheck := 0
+  individualCheck := 0
+  iWorkID := []
 return
 
 finish_text:
