@@ -12,9 +12,9 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ;   Variable setup   ;
 ;____________________;
 
+iniWrite, 0, %VARIABLES%, waifubot, waifuCount ;Writes in a blank value into the ini file
 PAUSE_TIMER := 4500 ;Variable for how long it waits before sending the next message
-variables := "variables.ini" ;Variable for the ini file. Sorta uneccesary but doesn't really matter
-iniWrite, 0, %variables%, waifubot, waifuCount ;Writes in a blank value into the ini file
+VARIABLES := "variables.ini" ;Variable for the ini file
 
 ;‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾;
 ;   Additional Hotkey setup   ;
@@ -24,7 +24,7 @@ iniWrite, 0, %variables%, waifubot, waifuCount ;Writes in a blank value into the
   Pause
 Return
 
-~^F4:: ;Breaks loop on ctrl+F4 to stop the script. ~ is so it can work at the same time as the GUI script
+~^F4:: ;Breaks loop on ctrl+F4 to stop the script
   loopBreak := 1 ;Variable for break condition. A statement in the loop checks if it's 1 or 0
 Return
 
@@ -38,11 +38,11 @@ Return
   GoSub, variable_setup
 
   ;Input for your waifus
-  InputBox, waifuCount, Interact counter, % "How many waifus do you want to interact with?", , ,150, , , , , % "e.g: 24" ;Message box to determine how many waifus you want to interact with
+  InputBox, waifuCount, Interact counter, % "How many waifus do you want to interact with?", , ,150, , , , , % "e.g: 24"
   GoSub, gui_check
 
   ;Output for your waifus
-  Loop, % waifuCount ;Starts loop which repeats for every waifu you have
+  Loop, % (waifuCount + 1) ;Starts loop which repeats for every waifu you have
   {
     if(loopBreak = 1) ;Check for cancellation
       break ;Breaks the while loop
@@ -62,9 +62,10 @@ return
   GoSub, variable_setup
 
   ;Input for your waifus
-  loop{ ;Loops infinitely until you cancel/escape
+  loop
+  { ;Loops infinitely until you cancel/escape
     Inputbox, msgValue , Interact counter, % "Type the waifus you want to interact with one by one. Press the cancel button when you've inputted all your waifus in.", , , ,120, , , , % "e.g: 151"
-    If(ErrorLevel = 1) ;stops when you press the cancel button. Reason why it's an if break loop and not a loop until is so it doesn't store the "e.g: 151" as part of the array
+    If(ErrorLevel = 1)
       break ;Breaks the loop and moves over to the output
 
     iWaifuCount[waifuCount] := msgValue ;Puts variable in [x] of array
@@ -72,14 +73,14 @@ return
   }
 
   ;GUI launch
-  GoSub, run_gui
+  GoSub, gui_check
 
   waifuCount -- ;Takes 1 away from waifuCount. Used so the first line isn't empty
 
   ;Output of your waifus
   if(waifuCount >= 0) ;Whole second loop around an if statement. This is only so it doesn't spit out an empty interaction if you cancel from the get-go
   {
-    loop, %WaifuCount% ;Loops infinitely until it meets the until condition
+    loop, % WaifuCount ;Loops infinitely until it meets the until condition
     {
       if(loopBreak = 1) ;Check for cancellation
         break ;Breaks the while loop
@@ -126,21 +127,7 @@ w_confirm:
   {
     Inputbox, workID , Waifu worker, % "Type the lowest id for the waifus you want to work", , , ,120, , , , % "e.g: 24"
     GoSub, gui_check
-
-    Loop, % WaifuCount
-    {
-      if(loopBreak = 1) ;Check for cancellation
-        break ;Breaks the while loop
-
-      if (waifuCount > 5)
-        Send, % "w.retire " . workID
-      else
-        Send, % "w.work " . workID
-
-      workID ++
-      waifuCount --
-      GoSub, message_finish
-    }
+    GoSub, working_loop
     GoSub, finish_text
   }
   else
@@ -152,42 +139,27 @@ w_confirm:
     }
 
     GoSub, run_gui
-
-    loop, % waifuCount
-    {
-      if(loopBreak = 1) ;Check for cancellation
-        break ;Breaks the while loop
-
-      if(waifuCount > 5)
-        Send, % "w.retire " . iWorkID[A_Index]
-      else
-        Send, % "w.work " . iWorkID[A_Index]
-
-      waifuCount --
-      GoSub, message_finish
-    }
+    GoSub, working_loop
     GoSub, finish_text
   }
 return
 
 gui_check:
   if(ErrorLevel = 1) ;Checks to see if you cancelled the message box
-    loopBreak = 1 ;Sets break condition
+    loopBreak := 1 ;Sets break condition
   else ;GUI launch
-  {
     GoSub, run_gui
-  }
 return
 
 run_gui:
-  iniWrite, %waifuCount%, %variables%, waifubot, waifuCount ;[GUI] Writes the amount of waifus you have
+  iniWrite, %waifuCount%, %VARIABLES%, waifubot, waifuCount ;[GUI] Writes the amount of waifus you have
   Run, waifubot_gui.ahk ;Runs the script for the GUI
 return
 
 variable_setup:
   waifuCount := 0 ;Resets waifu count number
   loopBreak := 0 ;Resets break condition
-  iniWrite, 0, %variables%, waifubot, exitScript ;[GUI] resets exit script condition
+  iniWrite, 0, %VARIABLES%, waifubot, exitScript ;[GUI] resets exit script condition
 
   iWaifucount := [] ;Sets up the array for the individual waifus.
 
@@ -197,7 +169,7 @@ variable_setup:
 return
 
 finish_text:
-  iniWrite, 1, %variables%, waifubot, exitScript ;[GUI] Writes exit script condition
+  iniWrite, 1, %VARIABLES%, waifubot, exitScript ;[GUI] Writes exit script condition
   if(loopBreak = 1)
     MsgBox, Interaction cancelled ;Message box to signal a cancellation
   else
@@ -205,11 +177,32 @@ finish_text:
 return
 
 message_finish:
-  Sleep, 100 ;Short pause. the enter keystroke doesn't register if you don't pause. potentially can be lower but i couldn't be bothered testing the boundaries
+  Sleep, 100
   Send, {enter} ;Enter keystroke to send the message into the chat
-  Sleep, %PAUSE_TIMER% ;Pause to wait for the cooldown
+  ;Sleep, % PAUSE_TIMER ;Pause to wait for the cooldown
 return
 
 w_cancel:
-  Gui, hide
+   Gui, hide
+   MsgBox, Interaction cancelled
+return
+
+working_loop:
+  Loop, % WaifuCount
+  {
+    if(loopBreak = 1) ;Check for cancellation
+      break ;Breaks the while loop
+
+    if (waifuCount > 5 AND individualCheck = 0)
+      Send, % "w.retire " . workID
+    else if (waifuCount > 5 AND individualCheck = 1)
+      Send, % "w.retire " . iWorkID[A_Index]
+    else if (individualCheck = 0)
+      Send, % "w.work " . workID
+    else
+      Send, % "w.work " . iWorkID[A_Index]
+    workID ++
+    waifuCount --
+    GoSub, message_finish
+  }
 return
