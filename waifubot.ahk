@@ -32,8 +32,18 @@ Return
 ;   Main Scripts   ;
 ;__________________;
 
-;F1 script - Interacts with all waifus
 ^F1::
+  Gui, 1: New, +AlwaysOnTop, WaifubotMain ;Creates GUI
+  Gui, add, Text, ,Waifubot GUI ;Creates title text
+  Gui, show, H400 W400, Waifubot
+  Gui, Add, Tab3, H400 W400, All waifus|Some waifus|Dungeon
+  Gui, Add, Text, ,test
+  Gui Tab, 2
+  Gui, Add, Text, , test 2
+return
+
+;F1 script - Interacts with all waifus
+^F6::
   GoSub, variable_setup ;Setups variables and arrays
 
   ;Input for your waifus

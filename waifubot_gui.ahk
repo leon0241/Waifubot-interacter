@@ -60,7 +60,7 @@ gui_calc: ;Calculates the position of the GUI and the total time
 return
 
 gui_elements: ;Creates the GUI and the GUI elements
-  Gui, 1: New, +AlwaysOnTop, Waifubot ;Creates GUI
+  Gui, 2: New, +AlwaysOnTop, Waifubot ;Creates GUI
   Gui, add, Text, ,Waifubot GUI ;Creates title text
   Gui, add, Text, vremainTime, % "Estimated time remaining: " . remainTime . " seconds" ;Creates remaining time text with remainTime modifier
   Gui, add, Progress, vprogressBar W350 H20 cRed, 0 ;Creates a progress bar that counts up to 100 with progressBar modifier
