@@ -66,7 +66,7 @@ return
   if(ErrorLevel = 1 AND waifuCount = 0) ;Checks to see if you cancelled from the start
     loopBreak := true ;Sets break condition
   else ;GUI launch if not cancelled
-    GoSub, run_gui ;Sets the waifu count and runs the GUI script
+    run_gui(WaifuCount) ;Sets the waifu count and runs the GUI script
   ;Outputting waifu text
   waifuCount -- ;Takes 1 away from waifuCount so the first line isn't empty
   message_output(iWaifuCount[A_Index])
@@ -110,7 +110,7 @@ gui_check: ;[general] Checks to see if you cancelled to see whether to run the G
   if(ErrorLevel = 1) ;Checks to see if you cancelled the message box
     loopBreak := true ;Sets break condition
   else ;GUI launch
-    GoSub, run_gui ;Sets the waifu count and runs the GUI script
+    run_gui(WaifuCount) ;Sets the waifu count and runs the GUI script
 return
 
 write_ini(var, writeValue)
@@ -118,10 +118,11 @@ write_ini(var, writeValue)
   iniWrite, var, %VARIABLES%, waifubot, writeValue
 }
 
-run_gui(waifuCount);[general] Sets the waifu count and runs the GUI script
-  write_ini(waifuCount, waifuCount)
+run_gui(waifuCount)
+{
+  write_ini(waifuCount, "waifuCount");[general] Sets the waifu count and runs the GUI script
   ;Run, waifubot_gui.ahk ;Runs the script for the GUI
-return
+}
 
 message_finish: ;[general] Returns and waits after a message
   Sleep, 100 ;Short wait to ensure the enter keystroke is measured
@@ -183,7 +184,7 @@ w_confirm: ;[working] Actions to take after you press the confirm button(main bo
       iWorkID[A_Index] := workID ;Sets value of the input box to [x] of the array
     }
 
-    GoSub, run_gui ;Sets the waifu count and runs the GUI script
+    run_gui(WaifuCount) ;Sets the waifu count and runs the GUI script
     GoSub, working_loop ;Types and increments working values
     GoSub, script_finish ;Actions for after the script has finished looping
   }
