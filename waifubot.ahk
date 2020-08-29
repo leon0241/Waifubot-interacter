@@ -12,7 +12,7 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ;   Variable setup   ;
 ;____________________;
 
-iniWrite, 0, %VARIABLES%, waifubot, waifuCount ;Writes in a blank value into the ini file
+write_ini(0, waifuCount) ;Writes in a blank value into the ini file
 PAUSE_TIMER := 4500 ;Variable for how long it waits before sending the next message
 VARIABLES := "variables.ini" ;Variable for the ini file
 
@@ -41,15 +41,8 @@ Return
   GoSub, gui_check ;Checks to see if you cancelled to see whether to run the GUI
 
   ;Outputting waifu text
-  Loop, % (waifuCount + 1) ;Starts loop which repeats for every waifu you have. +1 is so it interacts with id 0
-  {
-    if loopBreak ;Check for cancellation
-      break ;Breaks the while loop
-
-    Send, % "w.interact " . waifuCount ;Type out the "w.interact [x]" message
-    GoSub, message_finish ;Returns and waits after a message
-    waifuCount-- ;Takes away 1 from var waifuCount so the message decrements
-  }
+  waifuCount++
+  message_output(waifuCount) ;Starts loop which repeats for every waifu you have
 
   GoSub, script_finish ;Actions for after the script has finished looping
 return
@@ -73,19 +66,10 @@ return
   if(ErrorLevel = 1 AND waifuCount = 0) ;Checks to see if you cancelled from the start
     loopBreak := true ;Sets break condition
   else ;GUI launch if not cancelled
-    GoSub, run_gui ;Sets the waifu count and runs the GUI script
-
+    run_gui(WaifuCount) ;Sets the waifu count and runs the GUI script
   ;Outputting waifu text
   waifuCount -- ;Takes 1 away from waifuCount so the first line isn't empty
-  loop, % WaifuCount ;Loops for WaifuCount times
-  {
-    if loopBreak ;Check for cancellation
-      break ;Breaks the while loop
-
-    Send, % "w.interact " . iWaifuCount[A_Index] ;Types out the "w.interact [x]" message
-    GoSub, message_finish ;Returns and waits after a message
-  }
-
+  message_output(iWaifuCount[A_Index])
   GoSub, script_finish ;Actions for after the script has finished looping
 return
 
@@ -98,10 +82,22 @@ return
 ;   Subprocesses   ;
 ;__________________;
 
+message_output(value)
+{
+  loop, % value ;Loops for WaifuCount times
+  {
+    if loopBreak ;Check for cancellation
+      break ;Breaks the while loop
+
+    Send, % "w.interact " . value ;Types out the "w.interact [x]" message
+    GoSub, message_finish ;Returns and waits after a message
+  }
+}
+
 variable_setup: ;[general] Setups variables and arrays
   waifuCount := 0 ;Resets waifu count number
   loopBreak := false ;Resets break condition
-  iniWrite, 0, %VARIABLES%, waifubot, exitScript ; resets exit script condition
+  write_ini(0, exitScript) ; resets exit script condition
 
   iWaifucount := [] ;Sets up the array for the individual waifus.
 
@@ -114,13 +110,19 @@ gui_check: ;[general] Checks to see if you cancelled to see whether to run the G
   if(ErrorLevel = 1) ;Checks to see if you cancelled the message box
     loopBreak := true ;Sets break condition
   else ;GUI launch
-    GoSub, run_gui ;Sets the waifu count and runs the GUI script
+    run_gui(WaifuCount) ;Sets the waifu count and runs the GUI script
 return
 
-run_gui: ;[general] Sets the waifu count and runs the GUI script
-  iniWrite, %waifuCount%, %VARIABLES%, waifubot, waifuCount ;[GUI] Writes the amount of waifus you have into the ini file
+run_gui(waifuCount1)
+{
+  write_ini(waifuCount, "waifuCount") ;[general] Sets the waifu count and runs the GUI script
   Run, waifubot_gui.ahk ;Runs the script for the GUI
-return
+}
+
+write_ini(var, writeValue)
+{
+  iniWrite, var, %VARIABLES%, waifubot, writeValue
+}
 
 message_finish: ;[general] Returns and waits after a message
   Sleep, 100 ;Short wait to ensure the enter keystroke is measured
@@ -129,7 +131,7 @@ message_finish: ;[general] Returns and waits after a message
 return
 
 script_finish: ;[general] Actions for after the script has finished looping
-  iniWrite, 1, %VARIABLES%, waifubot, exitScript ;Writes exit script condition
+  write_ini(1, exitScript) ;Writes exit script condition
   if loopBreak ;Checks if break variable is true
     MsgBox, Interaction cancelled ;Message box to signal cancellation
   else
@@ -182,7 +184,7 @@ w_confirm: ;[working] Actions to take after you press the confirm button(main bo
       iWorkID[A_Index] := workID ;Sets value of the input box to [x] of the array
     }
 
-    GoSub, run_gui ;Sets the waifu count and runs the GUI script
+    run_gui(WaifuCount) ;Sets the waifu count and runs the GUI script
     GoSub, working_loop ;Types and increments working values
     GoSub, script_finish ;Actions for after the script has finished looping
   }
@@ -196,15 +198,20 @@ working_loop: ;[working] Types and increments working values
 
     ;Check to see what message to send in the chat
     if (waifuCount > 5 AND individualCheck = 0) ;retire and increment
-      Send, % "w.retire " . workID
+      work_output("w.retire", workID)
     else if (waifuCount > 5 AND individualCheck = 1) ;retire and individual
-      Send, % "w.retire " . iWorkID[A_Index]
+      work_output("w.retire", iWorkID[A_Index])
     else if (individualCheck = 0) ;work and increment
-      Send, % "w.work " . workID
+      work_output("w.work", workID)
     else ;work and individual
-      Send, % "w.work " . iWorkID[A_Index]
+      work_output("w.work", iWorkID[A_Index])
     workID ++ ;Increments workID. Doesn't affect individual since it uses a different var.
     waifuCount -- ;Decrements waifuCount. Used for the if loop
     GoSub, message_finish ;Returns and waits after any message
   }
 return
+
+work_output(text, id)
+{
+  Send, % text . id
+}
