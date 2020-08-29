@@ -113,15 +113,15 @@ gui_check: ;[general] Checks to see if you cancelled to see whether to run the G
     run_gui(WaifuCount) ;Sets the waifu count and runs the GUI script
 return
 
+run_gui(waifuCount1)
+{
+  write_ini(waifuCount, "waifuCount") ;[general] Sets the waifu count and runs the GUI script
+  Run, waifubot_gui.ahk ;Runs the script for the GUI
+}
+
 write_ini(var, writeValue)
 {
   iniWrite, var, %VARIABLES%, waifubot, writeValue
-}
-
-run_gui(waifuCount)
-{
-  write_ini(waifuCount, "waifuCount");[general] Sets the waifu count and runs the GUI script
-  ;Run, waifubot_gui.ahk ;Runs the script for the GUI
 }
 
 message_finish: ;[general] Returns and waits after a message
